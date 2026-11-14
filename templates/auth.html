@@ -1,14 +1,20 @@
 {% extends "base.html" %}
 {% block body %}
-<h2>{{ "Registracija" if mode == "register" else "Prijava" }}</h2>
-<form method="post">
-  <input type="text" name="username" placeholder="Nadimak" required autocomplete="username">
-  <input type="password" name="password" placeholder="Lozinka" required autocomplete="{{ 'new-password' if mode == 'register' else 'current-password' }}">
-  <button>{{ "Napravi nalog" if mode == "register" else "Uloguj se" }}</button>
-</form>
-{% if mode == "register" %}
-  <p>Već imaš nalog? <a href="{{ url_for('login') }}">Prijava</a></p>
-{% else %}
-  <p>Nemaš nalog? <a href="{{ url_for('register') }}">Registracija</a></p>
-{% endif %}
+<div class="auth">
+  <span class="brand">DD</span>
+  <h1>{{ "Napravi nalog" if mode == "register" else "Dobro došao/la" }}</h1>
+  <p class="muted">{{ "Registruj se nadimkom. Super admin te odobrava i onda možeš da poručuješ." if mode == "register" else "Prijavi se da poručiš hranu za subotu." }}</p>
+  <form method="post" class="card">
+    <label class="field"><span>Nadimak</span>
+      <input type="text" name="username" required maxlength="40" autocomplete="username" autocapitalize="none" autofocus></label>
+    <label class="field"><span>Lozinka</span>
+      <input type="password" name="password" required minlength="{{ 6 if mode == 'register' else 1 }}"
+             autocomplete="{{ 'new-password' if mode == 'register' else 'current-password' }}"></label>
+    <button class="btn block big">{{ "Napravi nalog" if mode == "register" else "Prijavi se" }}</button>
+  </form>
+  <p class="muted" style="text-align:center;margin-top:16px">
+    {% if mode == "register" %}Već imaš nalog? <a href="{{ url_for('login') }}">Prijava</a>
+    {% else %}Nemaš nalog? <a href="{{ url_for('register') }}">Registracija</a>{% endif %}
+  </p>
+</div>
 {% endblock %}

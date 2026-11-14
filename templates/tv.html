@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}DD · TV{% endblock %}
+{% block bodyclass %}tv{% endblock %}
+{% block chrome %}{% endblock %}
+{% block body %}
+<div id="board" data-live>
+  <header class="tv-head">
+    <h1>{{ jelo or "DD" }}</h1>
+    <p>Subota {{ datum|dan }}</p>
+  </header>
+  <div class="tv-grid">
+    <section class="tv-col">
+      <h2>Na redu · plati na pultu</h2>
+      {% for r in na_redu[:10] %}<div class="tv-item"><b>#{{ r.broj }}</b><span>{{ r.display_name }}</span></div>{% endfor %}
+      {% if na_redu|length > 10 %}<p style="color:#B2A69A">+{{ na_redu|length - 10 }} još</p>{% endif %}
+    </section>
+    <section class="tv-col prep">
+      <h2>Sprema se</h2>
+      {% for r in priprema[:10] %}<div class="tv-item"><b>#{{ r.broj }}</b><span>{{ r.display_name }}</span></div>{% endfor %}
+    </section>
+    <section class="tv-col ready">
+      <h2>Spremno · prijatno!</h2>
+      {% for r in spremno %}<div class="tv-item"><b>#{{ r.broj }}</b><span>{{ r.display_name }}</span></div>{% endfor %}
+    </section>
+  </div>
+</div>
+{% endblock %}

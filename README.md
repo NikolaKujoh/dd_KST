@@ -1,22 +1,31 @@
 # DD
 
-Interna aplikacija za subotnju hranu. Flask + SQLite.
+Interna aplikacija za subotnju hranu. Flask + SQLite, bez frontend biblioteka.
 
-- Registracija nadimkom i lozinkom. Prvi registrovani nalog je admin.
-- Admin odobrava naloge i upisuje display name, unosi jelo za subotu i priloge.
-- Porudžbine: subota 17:00–22:30 (Europe/Belgrade).
-- Red: nikad nije jeo, pa jeo jednom, pa dodatne porudžbine. Ko je jeo 2 puta, blokiran je dok ga admin ne odblokira.
-- Admin: `/admin` (red, čekiranje, zbir priloga), `/admin/izvestaj` (nisu jeli / jeli jednom / blokirani).
+## Uloge
+
+| Uloga | Šta radi |
+|---|---|
+| **Gost** | Poručuje (subota 17:00–22:30), prati status porudžbine uživo, prijavljuje dolazak, glasa u anketama, ocenjuje hranu i uslugu |
+| **DDejac** | Red (Plaćeno → Servirano), meni (jelo + prilozi), ankete, otprema račune posle smene, TV ekran |
+| **Super admin** | Odobrava naloge (display name + uloga), menja uloge i lozinke, odblokira, vidi sve račune; može sve što i DDejac |
+
+Prvi registrovani nalog je super admin. Postojeći admin iz prve verzije automatski postaje super admin.
+
+**Red:** nikad nije jeo → jeo jednom → dodatne porudžbine. Ko je jeo 2 puta, blokiran je dok ga super admin ne odblokira.
+
+**Obaveštenja:** stranice se same osvežavaju (polling na 4–8 s). Dodirni zvonce u zaglavlju da uključiš sistemska obaveštenja.
+
+**TV:** tab Red → „Prikaži na TV-u“ daje link bez prijave.
 
 ## cPanel
 
-1. **Setup Python App**: Python 3.9+, app root npr. `dd`, startup file `passenger_wsgi.py`, entry point `application`.
-2. Otpremi fajlove u app root (Git Version Control ili File Manager).
-3. U Python App ekranu dodaj `requirements.txt` i klikni **Run Pip Install**.
-4. Restart. Prvi nalog koji se registruje je admin, zato ga odmah napravi.
-5. `dd.db` i `secret.key` nastaju u app root-u pri prvom pokretanju. Ne brišu se pri deploy-u, a ne ulaze u git.
+1. **Setup Python App**: Python 3.9+, app root van javnog foldera (npr. `dd_app`), startup file `passenger_wsgi.py`, entry point `application`.
+2. Otpremi fajlove u app root.
+3. **Run Pip Install** za `requirements.txt`, pa **Restart**.
+4. `dd.db`, `secret.key` i `uploads/` nastaju u app root-u. Ne briši ih pri novom deploy-u.
 
-Opciono env promenljive: `DD_SECRET`, `DD_DB` (putanja do baze).
+Opciono env: `DD_SECRET`, `DD_DB`, `DD_UPLOADS`.
 
 ## Provera
 

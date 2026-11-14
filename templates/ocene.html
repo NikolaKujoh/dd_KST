@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% import "_m.html" as m %}
+{% block body %}
+<div class="stack">
+  <h1>Ocene</h1>
+
+  {% if staff %}
+  <section id="pregled" data-live class="stack">
+    <h2>Pregled po subotama</h2>
+    {% for x in pregled %}
+    <details class="card" {{ 'open' if loop.first }}>
+      <summary>{{ x.r.datum|dan }} · {{ x.r.jelo or "—" }} <span class="badge">{{ x.r.n }}</span></summary>
+      <div class="row" style="gap:24px;margin-bottom:8px">
+        <div><span class="score">{{ "%.1f"|format(x.r.hrana) }}</span> <span class="muted sm">hrana</span></div>
+        <div><span class="score">{{ "%.1f"|format(x.r.usluga) }}</span> <span class="muted sm">usluga</span></div>
+      </div>
+      {% for k in x.kom %}<p class="quote">{{ k.komentar }}<br><span class="muted sm">— {{ k.display_name }} · {{ k.hrana }}/{{ k.usluga }}</span></p>{% endfor %}
+    </details>
+    {% else %}<div class="card empty">Još nema ocena.</div>{% endfor %}
+  </section>
+  <h2 style="margin-top:24px">Tvoje ocene</h2>
+  {% endif %}
+
+  {% for d in datumi %}
+  {% set r = moje.get(d.datum) %}
+  <form method="post" action="{{ url_for('oceni', datum=d.datum) }}" class="card">
+    <p class="eyebrow">{{ icon('calendar', 16) }} {{ d.datum|dan }}</p>
+    <h2>{{ d.jelo or "DD" }}</h2>
+    {{ m.stars('hrana', d.datum, r.hrana if r, 'Hrana') }}
+    {{ m.stars('usluga', d.datum, r.usluga if r, 'Usluga') }}
+    <label class="field"><span>Komentar (nije obavezno)</span>
+      <textarea name="komentar" maxlength="500" placeholder="Šta je bilo top, šta da popravimo?">{{ r.komentar if r }}</textarea></label>
+    <button class="btn">{{ "Izmeni ocenu" if r else "Pošalji ocenu" }}</button>
+  </form>
+  {% else %}
+  <div class="card empty">Ocenjivati možeš kad jednom budeš serviran/a.</div>
+  {% endfor %}
+</div>
+{% endblock %}

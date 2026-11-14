@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% import "_m.html" as m %}
+{% block body %}
+<div class="stack">
+  <div class="head-row"><h1>Meni</h1>{{ m.datenav(nav, 'meni') }}</div>
+
+  <form method="post" action="{{ url_for('set_jelo', d=nav.datum) }}" class="card">
+    <label class="field"><span>Glavno jelo za {{ nav.datum|dan }}</span>
+      <input type="text" name="jelo" value="{{ jelo }}" maxlength="120" required placeholder="npr. Pasulj sa kobasicom"></label>
+    <button class="btn">Sačuvaj jelo</button>
+  </form>
+
+  <section class="card" id="prilozi" data-live>
+    <h2>Prilozi</h2>
+    <p class="muted sm">Važe za svaku subotu dok ih ne obrišeš.</p>
+    <div class="chips" style="margin-bottom:14px">
+      {% for p in prilozi %}
+      <form method="post" action="{{ url_for('del_prilog', pid=p.id) }}" data-ajax class="tag">
+        {{ p.naziv }}<button class="icon-btn" aria-label="Obriši {{ p.naziv }}">{{ icon('x', 16) }}</button>
+      </form>
+      {% else %}<span class="muted">Nema priloga.</span>{% endfor %}
+    </div>
+    <form method="post" action="{{ url_for('add_prilog') }}" class="inline-form" data-ajax>
+      <input type="text" name="naziv" maxlength="60" required placeholder="Novi prilog" aria-label="Novi prilog">
+      <button class="btn">{{ icon('plus') }} Dodaj</button>
+    </form>
+  </section>
+</div>
+{% endblock %}

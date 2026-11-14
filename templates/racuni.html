@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block body %}
+<div class="stack">
+  <h1>Računi</h1>
+
+  <form method="post" action="{{ url_for('upload_racun') }}" enctype="multipart/form-data" class="card">
+    <h2>Otpremi račune posle smene</h2>
+    <label class="drop">{{ icon('camera', 32) }}<span id="picked">Slikaj ili izaberi slike</span>
+      <input type="file" name="slike" accept="image/*" multiple required class="visually-hidden"
+             onchange="document.getElementById('picked').textContent = this.files.length + ' izabrano'"></label>
+    <div class="inline-form" style="margin-top:14px;flex-wrap:wrap">
+      <label class="field grow" style="margin:0"><span>Datum smene</span><input type="date" name="d" value="{{ danas }}" required></label>
+      <label class="field grow" style="margin:0"><span>Napomena</span><input type="text" name="napomena" maxlength="200" placeholder="npr. Maxi, 4.520 din"></label>
+    </div>
+    <button class="btn block" style="margin-top:14px">Otpremi</button>
+  </form>
+
+  <div id="racuni" data-live class="stack">
+    {% for datum, rs in grupe.items() %}
+    <section class="card">
+      <div class="row between"><h2>{{ datum|dan }}</h2><span class="badge">{{ rs|length }}</span></div>
+      <div class="thumbs">
+        {% for r in rs %}
+        <a href="{{ url_for('slika_racuna', rid=r.id) }}" target="_blank" rel="noopener" title="{{ r.napomena }}">
+          <img src="{{ url_for('slika_racuna', rid=r.id) }}" alt="Račun {{ r.display_name }} {{ r.napomena }}" loading="lazy">
+          <small>{{ r.display_name }}{% if r.napomena %} · {{ r.napomena }}{% endif %}</small>
+        </a>
+        {% endfor %}
+      </div>
+    </section>
+    {% else %}
+    <div class="card empty">Još nema otpremljenih računa.</div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

@@ -4,3 +4,5 @@ dd.db
 secret.key
 venv/
 .venv/
+.claude/
+uploads/

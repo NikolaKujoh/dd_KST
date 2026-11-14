@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block body %}
+<div class="stack">
+  <h1>Ankete</h1>
+
+  {% if staff %}
+  <details class="card">
+    <summary>{{ icon('plus') }} Nova anketa</summary>
+    <form method="post" action="{{ url_for('nova_anketa') }}">
+      <label class="field"><span>Pitanje</span><input type="text" name="pitanje" maxlength="200" required placeholder="Šta da kuvamo sledeće?"></label>
+      <label class="field"><span>Opcije (svaka u svom redu, 2–8)</span><textarea name="opcije" required placeholder="Pasulj&#10;Sarma&#10;Musaka"></textarea></label>
+      <button class="btn">Objavi</button>
+    </form>
+  </details>
+  {% endif %}
+
+  <div id="ankete" data-live class="stack">
+  {% for x in lista %}
+    {% set a = x.a %}
+    <section class="card">
+      <div class="row between" style="align-items:flex-start">
+        <h2>{{ a.pitanje }}</h2>
+        {% if not a.aktivna %}<span class="badge">Zatvorena</span>{% endif %}
+      </div>
+      {% if a.moj or not a.aktivna or staff %}
+        {% for o in x.opcije %}
+          {% set p = (100 * o.n / x.ukupno)|round|int if x.ukupno else 0 %}
+          <div class="bar {{ 'mine' if a.moj == o.id }}" style="--p: {{ p }}%"><span>{{ o.tekst }}</span><span>{{ p }}% · {{ o.n }}</span></div>
+        {% endfor %}
+        <p class="muted sm">Glasova: {{ x.ukupno }}</p>
+      {% endif %}
+      {% if a.aktivna and (not a.moj or staff) %}
+        {% if not a.moj %}
+        <form method="post" action="{{ url_for('glasaj', aid=a.id) }}">
+          {% for o in x.opcije %}
+          <label class="opt"><input type="radio" name="opcija" value="{{ o.id }}" required> {{ o.tekst }}</label>
+          {% endfor %}
+          <button class="btn">Glasaj</button>
+        </form>
+        {% endif %}
+      {% endif %}
+      {% if staff %}
+      <form method="post" action="{{ url_for('zatvori_anketu', aid=a.id) }}" data-ajax style="margin-top:10px">
+        <button class="btn sm ghost">{{ "Zatvori anketu" if a.aktivna else "Ponovo otvori" }}</button>
+      </form>
+      {% endif %}
+    </section>
+  {% else %}
+    <div class="card empty">Još nema anketa.</div>
+  {% endfor %}
+  </div>
+</div>
+{% endblock %}

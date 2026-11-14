@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}#{{ o.broj }} · DD{% endblock %}
+{% block body %}
+<div class="stack">
+  <section class="confirm {{ 'fresh' if novo }}">
+    <svg class="check-anim" viewBox="0 0 52 52" aria-hidden="true"><circle cx="26" cy="26" r="26"/><path d="M15 27l7 7 15-15"/></svg>
+    <p class="eyebrow" style="justify-content:center">{{ "Porudžbina primljena" if novo else "Porudžbina" }}</p>
+    <h1 class="big-num">#{{ o.broj }}</h1>
+    <p class="muted">{{ jelo }}{% if o.prilozi %} · {{ o.prilozi }}{% endif %}</p>
+  </section>
+
+  {% set s = 2 if o.servirano else (1 if o.placeno else 0) %}
+  <section class="card" id="track" data-live>
+    <ol class="stepper">
+      <li class="done"><span class="dotx">{{ icon('check', 16) }}</span>
+        <div><b>Primljeno</b><small>U redu si za {{ o.datum|dan }}</small></div></li>
+      <li class="{{ 'done' if s > 0 else 'current' }}"><span class="dotx">{{ icon('check', 16) if s > 0 else icon('cash', 16) }}</span>
+        <div><b>Plaćeno</b><small>{{ "Plaćanje primljeno" if s > 0 else "Plati keš na pultu" }}</small></div></li>
+      <li class="{{ 'done' if s == 2 else ('current' if s == 1) }}"><span class="dotx">{{ icon('check', 16) if s == 2 else icon('utensils', 16) }}</span>
+        <div><b>Servirano</b><small>{{ "Prijatno!" if s == 2 else "Spremamo tvoj tanjir" }}</small></div></li>
+    </ol>
+    {% if s < 2 and ispred is not none %}
+    <div class="ahead"><b>{{ ispred }}</b><span class="muted">{{ "si sledeći/a na redu" if ispred == 0 else "ispred tebe u redu" }}</span></div>
+    {% endif %}
+    {% if s == 2 %}
+    <div class="ahead" style="justify-content:space-between;align-items:center"><span>Kako je bilo?</span>
+      <a class="btn sm ghost" href="{{ url_for('ocene') }}">{{ icon('star', 18) }} Oceni</a></div>
+    {% endif %}
+  </section>
+
+  <div class="card notice" data-notif hidden>{{ icon('bell') }}
+    <div class="grow"><b>Javićemo ti kad je spremno</b><br><span class="muted sm">Dodirni da uključiš obaveštenja.</span></div>
+  </div>
+
+  <a href="{{ url_for('index') }}" class="btn ghost block">Nazad</a>
+</div>
+{% endblock %}

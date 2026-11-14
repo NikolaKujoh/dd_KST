@@ -1,0 +1,27 @@
+{% macro datenav(nav, ep) %}
+<div class="datenav">
+  <a class="icon-btn" href="{{ url_for(ep, d=nav.prev) }}" aria-label="Prethodna subota">{{ icon('left') }}</a>
+  <b>{{ nav.datum|dan }}</b>
+  <a class="icon-btn" href="{{ url_for(ep, d=nav.next) }}" aria-label="Sledeća subota">{{ icon('right') }}</a>
+</div>
+{% endmacro %}
+
+{% macro stars(name, prefix, val, label) %}
+<fieldset class="stars">
+  <legend>{{ label }}</legend>
+  <div class="stars-row">
+    {% for i in range(5, 0, -1) %}
+    <input type="radio" id="{{ prefix }}-{{ name }}-{{ i }}" name="{{ name }}" value="{{ i }}" {{ 'checked' if val == i }} required>
+    <label for="{{ prefix }}-{{ name }}-{{ i }}" title="{{ i }} od 5"><span class="visually-hidden">{{ i }} od 5</span>{{ icon('star', 30) }}</label>
+    {% endfor %}
+  </div>
+</fieldset>
+{% endmacro %}
+
+{% macro person_list(title, people, hint) %}
+<section class="card">
+  <div class="row between"><h3>{{ title }}</h3><span class="badge">{{ people|length }}</span></div>
+  {% if hint %}<p class="muted sm">{{ hint }}</p>{% endif %}
+  <div class="names">{% for x in people %}<span>{{ x.display_name }}</span>{% else %}<span class="muted">nema</span>{% endfor %}</div>
+</section>
+{% endmacro %}

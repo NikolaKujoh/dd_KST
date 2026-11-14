@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block body %}
+<div class="stack">
+  <section class="card hero">
+    <p class="eyebrow">{{ icon('calendar', 16) }} Subota {{ datum|dan }}</p>
+    <h1>{{ jelo or "Jelo uskoro" }}</h1>
+    <p class="status-line"><span class="dot {{ 'on' if otvoreno }}"></span>{{ prozor }}</p>
+  </section>
+
+  {% if user.approved %}
+  <section class="card" id="rsvp" data-live>
+    <div class="row between">
+      <div>
+        <h2>Dolaziš na DD?</h2>
+        <p class="muted sm" style="margin:0">Prijavljeno: <b>{{ dolazi_n }}</b></p>
+      </div>
+      <form method="post" action="{{ url_for('dolazim') }}" data-ajax>
+        <button class="btn {{ 'ok' if dolazim else 'ghost' }}" aria-pressed="{{ 'true' if dolazim else 'false' }}">
+          {% if dolazim %}{{ icon('check') }} Dolazim{% else %}Dolazim{% endif %}
+        </button>
+      </form>
+    </div>
+  </section>
+  {% endif %}
+
+  {% if moje %}
+  <section class="card" id="moje" data-live>
+    <h2>Tvoje porudžbine</h2>
+    <div class="list">
+      {% for m in moje %}
+      <a href="{{ url_for('status', oid=m.id) }}" style="color:inherit;text-decoration:none">
+        <span class="num">#{{ m.broj }}</span>
+        <span class="grow">{{ m.prilozi or "bez priloga" }}</span>
+        {% if m.servirano %}<span class="badge done">Servirano</span>
+        {% elif m.placeno %}<span class="badge paid">Plaćeno</span>
+        {% else %}<span class="badge">U redu</span>{% endif %}
+        {{ icon('right', 18) }}
+      </a>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+
+  {% if razlog %}
+  <div class="card notice">{{ icon('clock') }}<div>{{ razlog }}{% if user.approved %}<br><span class="muted sm">Pojeo/la si {{ n }} od {{ MAX_OBROKA }} obroka.</span>{% endif %}</div></div>
+  {% else %}
+  <form method="post" action="{{ url_for('poruci') }}" class="card">
+    <h2>Izaberi priloge</h2>
+    <p class="muted sm">Uz {{ jelo }}. Plaćaš keš na pultu.</p>
+    <div class="chips">
+      {% for p in prilozi %}
+      <label class="chip"><input type="checkbox" name="prilozi" value="{{ p.naziv }}"><span>{{ icon('check', 18) }}{{ p.naziv }}</span></label>
+      {% else %}<p class="muted">Nema priloga ove nedelje.</p>{% endfor %}
+    </div>
+    {% if moje %}<p class="muted sm" style="margin-top:12px">Već imaš porudžbinu. Nova ide na kraj reda.</p>{% endif %}
+    <div class="sticky-cta"><button class="btn block big">Poruči</button></div>
+  </form>
+  {% endif %}
+</div>
+{% endblock %}

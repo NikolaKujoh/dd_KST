@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% import "_m.html" as m %}
+{% block body %}
+{% set boss = user.role == "superadmin" %}
+<div class="stack">
+  <h1>Ljudi</h1>
+
+  <section class="card" id="pending" data-live>
+    <div class="row between"><h2>Čekaju odobrenje</h2><span class="badge {{ 't2' if pending }}">{{ pending|length }}</span></div>
+    <div class="list">
+      {% for x in pending %}
+      <div style="flex-wrap:wrap">
+        <b class="grow">{{ x.username }}</b>
+        {% if boss %}
+        <form method="post" action="{{ url_for('odobri', uid=x.id) }}" class="inline-form" style="flex-basis:100%">
+          <input type="text" name="display_name" required maxlength="40" placeholder="Display name" aria-label="Display name za {{ x.username }}">
+          <select name="role" aria-label="Uloga" style="max-width:130px">{% for k, v in ULOGE.items() %}<option value="{{ k }}">{{ v }}</option>{% endfor %}</select>
+          <button class="btn sm ok">Odobri</button>
+        </form>
+        <form method="post" action="{{ url_for('odbij', uid=x.id) }}" data-ajax><button class="btn sm danger">Odbij</button></form>
+        {% endif %}
+      </div>
+      {% else %}<p class="muted">Nema novih naloga.</p>{% endfor %}
+    </div>
+  </section>
+
+  <div class="cols3">
+    {{ m.person_list("Nisu jeli", nikad, "Preporuka: daj im prednost.") }}
+    {{ m.person_list("Jeli jednom", jednom, "") }}
+    {{ m.person_list("Blokirani", blokirani, "Jeli " ~ MAX_OBROKA ~ " puta.") }}
+  </div>
+
+  <section class="card" id="svi" data-live>
+    <h2>Svi korisnici</h2>
+    <div class="list">
+      {% for x in users %}
+      <div style="flex-wrap:wrap">
+        <div class="grow">
+          <b>{{ x.display_name }}</b> <span class="muted sm">@{{ x.username }}</span><br>
+          <span class="badge {{ 't2' if x.role != 'user' }}">{{ ULOGE[x.role] }}</span>
+          <span class="badge {{ 't3' if x.eaten < MAX_OBROKA else 'paid' }}">jeo {{ x.eaten }}x</span>
+        </div>
+        {% if boss and x.eaten >= MAX_OBROKA %}
+        <form method="post" action="{{ url_for('odblokiraj', uid=x.id) }}" data-ajax><button class="btn sm warn">Odblokiraj</button></form>
+        {% endif %}
+        {% if boss and x.id != user.id %}
+        <details style="flex-basis:100%">
+          <summary class="muted sm" style="cursor:pointer;min-height:32px">Izmeni</summary>
+          <form method="post" action="{{ url_for('izmeni', uid=x.id) }}" class="inline-form" style="margin:8px 0">
+            <input type="text" name="display_name" value="{{ x.display_name }}" maxlength="40" aria-label="Display name">
+            <select name="role" aria-label="Uloga" style="max-width:130px">{% for k, v in ULOGE.items() %}<option value="{{ k }}" {{ 'selected' if k == x.role }}>{{ v }}</option>{% endfor %}</select>
+            <button class="btn sm">Sačuvaj</button>
+          </form>
+          <form method="post" action="{{ url_for('nova_lozinka', uid=x.id) }}" class="inline-form">
+            <input type="password" name="password" minlength="6" required placeholder="Nova lozinka" autocomplete="new-password" aria-label="Nova lozinka">
+            <button class="btn sm ghost">Postavi</button>
+          </form>
+        </details>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+</div>
+{% endblock %}
