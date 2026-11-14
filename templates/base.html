@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="sr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DD</title>
+<style>
+  body{font-family:system-ui,sans-serif;max-width:640px;margin:0 auto;padding:16px;line-height:1.4}
+  nav{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+  input,button,select{font:inherit;padding:8px;margin:2px 0}
+  input[type=text],input[type=password]{width:100%;box-sizing:border-box}
+  button{cursor:pointer}
+  table{width:100%;border-collapse:collapse}
+  td,th{border-bottom:1px solid #8884;padding:6px;text-align:left}
+  .msg{background:#ffd;border:1px solid #cc8;padding:8px;margin:8px 0;color:#000}
+  .muted{opacity:.7}
+  form.inline{display:inline}
+</style>
+</head>
+<body>
+<nav>
+  <b>DD</b>
+  {% if session.uid %}
+    <a href="{{ url_for('index') }}">Poruči</a>
+    {% if user and user.is_admin %}
+      <a href="{{ url_for('admin') }}">Admin</a>
+      <a href="{{ url_for('izvestaj') }}">Izveštaj</a>
+    {% endif %}
+    <a href="{{ url_for('logout') }}">Odjava</a>
+  {% endif %}
+</nav>
+{% for m in get_flashed_messages() %}<div class="msg">{{ m }}</div>{% endfor %}
+{% block body %}{% endblock %}
+</body>
+</html>

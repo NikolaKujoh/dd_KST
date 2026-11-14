@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% macro dd() %}<input type="hidden" name="datum" value="{{ datum }}">{% endmacro %}
+{% block body %}
+<h2>Admin</h2>
+
+<h3>Subota {{ datum }}</h3>
+<p><a href="{{ url_for('admin', d=prev) }}">&laquo; prethodna</a> |
+   <a href="{{ url_for('admin', d=next) }}">sledeća &raquo;</a></p>
+<form method="post" action="{{ url_for('set_jelo') }}">
+  {{ dd() }}
+  <input type="text" name="jelo" value="{{ jelo }}" placeholder="Jelo" required>
+  <button>Sačuvaj jelo</button>
+</form>
+
+<h3>Prilozi</h3>
+{% for p in prilozi %}
+  <form class="inline" method="post" action="{{ url_for('del_prilog', pid=p.id) }}">
+    {{ dd() }}{{ p.naziv }} <button title="Obriši">&times;</button>
+  </form>&nbsp;
+{% else %}<span class="muted">Nema priloga.</span>{% endfor %}
+<form method="post" action="{{ url_for('add_prilog') }}">
+  {{ dd() }}
+  <input type="text" name="naziv" placeholder="Novi prilog" required>
+  <button>Dodaj</button>
+</form>
+
+<h3>Red čekanja ({{ cekanje|length }})</h3>
+<table>
+  {% for r in cekanje %}
+  <tr>
+    <td>{{ loop.index }}.</td>
+    <td>{{ r.display_name }} <span class="muted">({{ "nikad jeo" if r.tier == 1 else "jeo " ~ r.eaten ~ "x" if r.tier == 2 else "dodatna, jeo " ~ r.eaten ~ "x" }})</span><br>
+        {{ r.prilozi or "bez priloga" }}</td>
+    <td><form method="post" action="{{ url_for('servirano', oid=r.id) }}">{{ dd() }}<button>Servirano</button></form></td>
+  </tr>
+  {% else %}<tr><td class="muted">Nema porudžbina.</td></tr>{% endfor %}
+</table>
+
+{% if zbir %}
+<h3>Zbir priloga</h3>
+<p>{% for n, c in zbir %}{{ n }}: <b>{{ c }}</b>{{ ", " if not loop.last }}{% endfor %}</p>
+{% endif %}
+
+{% if servirane %}
+<h3>Servirani ({{ servirane|length }})</h3>
+<table>
+  {% for r in servirane %}
+  <tr>
+    <td>{{ r.display_name }}</td><td>{{ r.prilozi or "bez priloga" }}</td>
+    <td><form method="post" action="{{ url_for('servirano', oid=r.id) }}">{{ dd() }}<button>Poništi</button></form></td>
+  </tr>
+  {% endfor %}
+</table>
+{% endif %}
+
+<h3>Korisnici</h3>
+<table>
+  {% for x in users %}
+  <tr>
+    <td>{{ x.username }}</td>
+    <td>
+      {% if not x.approved %}
+        <form method="post" action="{{ url_for('odobri', uid=x.id) }}">{{ dd() }}
+          <input type="text" name="display_name" placeholder="Display name" required>
+          <button>Odobri</button></form>
+      {% else %}
+        {{ x.display_name }} <span class="muted">(jeo {{ x.eaten }}x)</span>
+        {% if x.eaten >= max %}
+          <form class="inline" method="post" action="{{ url_for('odblokiraj', uid=x.id) }}">{{ dd() }}<button>Odblokiraj</button></form>
+        {% endif %}
+      {% endif %}
+    </td>
+  </tr>
+  {% endfor %}
+</table>
+{% endblock %}
